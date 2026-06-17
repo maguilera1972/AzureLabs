@@ -1,0 +1,24 @@
+# Exemple de configuration Cloudflare Tunnel (cloudflared)
+# Fichier cible : /etc/cloudflared/config.yml
+#
+# 1. Créer le tunnel dans Cloudflare Zero Trust :
+#    Networks → Tunnels → Create tunnel → Cloudflared
+# 2. Copier le token ou le credentials-file fourni
+# 3. Public Hostname :
+#      Subdomain : azurelabs
+#      Domain    : aguilera.ch
+#      Service   : http://localhost:80
+# 4. DNS : Cloudflare crée automatiquement l'enregistrement CNAME vers le tunnel
+#
+# Redirect URI Azure AD à enregistrer :
+#   https://azurelabs.aguilera.ch/api/azure/auth/callback
+#
+# Aucun port 80/443 à ouvrir sur le pare-feu : le tunnel sort en HTTPS vers Cloudflare.
+
+tunnel: <VOTRE-TUNNEL-ID>
+credentials-file: /etc/cloudflared/<VOTRE-TUNNEL-ID>.json
+
+ingress:
+  - hostname: azurelabs.aguilera.ch
+    service: http://localhost:80
+  - service: http_status:404

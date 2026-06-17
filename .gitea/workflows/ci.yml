@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python — syntaxe
+        run: |
+          python3 -m compileall -q backend/app scripts
+
+      - name: Dépendances
+        run: |
+          python3 -m venv .ci-venv
+          .ci-venv/bin/pip install -q -r backend/requirements.txt
+
+      - name: Import FastAPI
+        run: |
+          cd backend
+          ../.ci-venv/bin/python3 -c "from app.main import app; print(app.title)"
+
+      - name: Version assets
+        run: .ci-venv/bin/python3 scripts/sync_asset_version.py

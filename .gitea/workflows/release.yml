@@ -1,0 +1,71 @@
+name: Release et déploiement
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lire la version
+        id: version
+        run: |
+          TAG="${{ gitea.ref_name }}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Déployer en production
+        run: |
+          chmod +x /var/www/lab-console/deploy/deploy.sh
+          /var/www/lab-console/deploy/deploy.sh "${{ steps.version.outputs.tag }}"
+
+      - name: Créer la release Gitea
+        env:
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          NOTES=$(awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" {found=1; next}
+            found && /^## / {exit}
+            found {print}
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="Release Lab Console ${VERSION}"
+          fi
+          BODY=$(NOTES="$NOTES" python3 -c "
+          import json, os
+          print(json.dumps({
+              'tag_name': os.environ['TAG'],
+              'name': f\"Lab Console {os.environ['VERSION']}\",
+              'body': os.environ['NOTES'],
+              'prerelease': False,
+          }))
+          ")
+          curl -sf -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            "https://git.aguilera.ch/api/v1/repos/Michel/AzureLabs/releases"
+
+      - name: Joindre le mode d'emploi PDF
+        env:
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          RELEASE_ID=$(curl -sf \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            "https://git.aguilera.ch/api/v1/repos/Michel/AzureLabs/releases/tags/${TAG}" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+          curl -sf -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -F "attachment=@docs/Mode-emploi-Lab-Console.pdf" \
+            "https://git.aguilera.ch/api/v1/repos/Michel/AzureLabs/releases/${RELEASE_ID}/assets"

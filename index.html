@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Console — Azure Training Labs</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=1.0.0">
+</head>
+<body>
+  <!-- Écran de connexion -->
+  <div id="login-screen" class="auth-screen">
+    <div class="auth-card">
+      <img src="/api/branding/logo" alt="Lab Console" class="auth-logo" data-app-logo width="56" height="56">
+      <h1>Lab Console</h1>
+      <p class="auth-subtitle">Connectez-vous pour accéder à la console</p>
+      <form id="login-form" class="auth-form">
+        <label>
+          <span>Identifiant</span>
+          <input type="text" id="login-username" autocomplete="username" required placeholder="Votre identifiant">
+        </label>
+        <label>
+          <span>Mot de passe</span>
+          <input type="password" id="login-password" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Changement de mot de passe obligatoire -->
+  <div id="password-change-screen" class="auth-screen hidden">
+    <div class="auth-card">
+      <img src="/api/branding/logo" alt="Lab Console" class="auth-logo" data-app-logo width="56" height="56">
+      <h1>Changer le mot de passe</h1>
+      <p id="password-change-note" class="auth-subtitle"></p>
+      <form id="password-change-form" class="auth-form">
+        <label>
+          <span>Mot de passe actuel</span>
+          <input type="password" id="pwd-current" autocomplete="current-password" required>
+        </label>
+        <label>
+          <span>Nouveau mot de passe</span>
+          <input type="password" id="pwd-new" autocomplete="new-password" required minlength="6">
+        </label>
+        <label>
+          <span>Confirmer le nouveau mot de passe</span>
+          <input type="password" id="pwd-confirm" autocomplete="new-password" required minlength="6">
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="app hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/api/branding/logo" alt="Lab Console" class="brand-logo" data-app-logo width="28" height="28">
+        <div class="brand-text">
+          <strong>Lab Console</strong>
+          <small>Azure Training Labs</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section">Navigation</span>
+        <button class="nav-item active" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Tableau de bord
+        </button>
+        <button class="nav-item" data-view="workshops">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Ateliers
+        </button>
+        <button class="nav-item" data-view="create">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          Nouvel atelier
+        </button>
+        <button class="nav-item" data-view="estimate">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Estimation coûts
+        </button>
+
+        <span class="nav-section">Configuration</span>
+        <button class="nav-item" data-view="azure">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          Connexion Azure
+        </button>
+        <button class="nav-item hidden" data-view="users" id="nav-users">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Utilisateurs
+        </button>
+        <button class="nav-item hidden" data-view="branding" id="nav-branding">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          Logo
+        </button>
+
+        <span class="nav-section">Aide</span>
+        <a class="nav-item nav-link" href="/docs/Mode-emploi-Lab-Console.pdf?v=1.0.0" download="Mode-emploi-Lab-Console.pdf" title="Mode d'emploi avec captures d'écran">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>
+          Mode d'emploi (PDF)
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div id="azure-status" class="azure-badge disconnected">
+          <span class="dot"></span>
+          <div class="azure-badge-text">
+            <span class="azure-label">Azure</span>
+            <span class="azure-value">Non connecté</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">
+            <h2 id="page-title">Tableau de bord</h2>
+            <p id="page-subtitle">Vue consolidée de vos ateliers Azure</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div id="user-menu" class="user-menu hidden">
+            <div class="user-menu-left">
+              <img id="user-avatar" class="user-avatar" src="" alt="" width="40" height="40">
+              <button type="button" class="btn btn-secondary btn-sm user-logout-btn" id="user-logout-btn" title="Se déconnecter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                Déconnexion
+              </button>
+            </div>
+            <div class="user-menu-details">
+              <span id="user-display-name" class="user-display-name"></span>
+            </div>
+          </div>
+          <div class="currency-switcher">
+            <div id="currency-toggle" class="currency-toggle"></div>
+            <span id="exchange-rate-info" class="exchange-rate-info"></span>
+          </div>
+          <div class="topbar-clock" id="topbar-clock"></div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="view active">
+          <div id="dashboard-metrics" class="metrics-grid"></div>
+          <div class="card card-elevated">
+            <div class="card-header">
+              <h2>Ateliers par groupe de ressources</h2>
+            </div>
+            <div id="dashboard-workshops" class="table-wrap"></div>
+          </div>
+        </section>
+
+        <!-- Workshops list -->
+        <section id="view-workshops" class="view">
+          <div id="workshops-list" class="workshops-grid"></div>
+        </section>
+
+        <!-- Workshop detail -->
+        <section id="view-workshop-detail" class="view">
+          <div class="detail-header">
+            <button class="btn btn-ghost btn-back" id="back-to-workshops">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Retour aux ateliers
+            </button>
+          </div>
+          <div id="workshop-detail"></div>
+        </section>
+
+        <!-- Create workshop -->
+        <section id="view-create" class="view">
+          <form id="create-form" class="card card-elevated form-card">
+            <div class="card-header">
+              <h2>Informations générales</h2>
+              <p class="card-desc">Définissez le nom et la région de déploiement de l'atelier.</p>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="ws-name">Nom de l'atelier</label>
+                <input type="text" id="ws-name" required placeholder="ex: Formation-Docker-Mars">
+              </div>
+              <div class="field">
+                <label for="ws-location">Région Azure</label>
+                <select id="ws-location">
+                  <option value="francecentral">France Central</option>
+                  <option value="westeurope">West Europe</option>
+                  <option value="northeurope">North Europe</option>
+                  <option value="switzerlandnorth">Switzerland North</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ws-duration">Durée de l'atelier</label>
+                <div class="input-suffix">
+                  <input type="number" id="ws-duration" min="1" max="365" value="5" required>
+                  <span>jours</span>
+                </div>
+              </div>
+            </div>
+
+            <fieldset class="schedule-fieldset">
+              <legend>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Planification automatique
+              </legend>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="ws-start">Démarrage</label>
+                  <div class="input-suffix">
+                    <input type="number" id="ws-start" min="0" max="23" value="7">
+                    <span>h</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="ws-stop">Arrêt</label>
+                  <div class="input-suffix">
+                    <input type="number" id="ws-stop" min="0" max="23" value="19">
+                    <span>h</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="ws-tz">Fuseau horaire</label>
+                  <select id="ws-tz">
+                    <option value="Europe/Paris">Europe/Paris</option>
+                    <option value="Europe/London">Europe/London</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                </div>
+                <div class="field checkbox-field">
+                  <label class="toggle-label">
+                    <input type="checkbox" id="ws-schedule-enabled" checked>
+                    <span class="toggle-switch"></span>
+                    Activer la planification
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="vm-section">
+              <div class="section-header">
+                <div>
+                  <h3>Machines virtuelles</h3>
+                  <p class="section-desc">Définissez le type, la quantité et la configuration — ex. 10× Windows 11</p>
+                </div>
+                <button type="button" class="btn btn-secondary" id="add-vm-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 5v14M5 12h14"/></svg>
+                  Ajouter une VM
+                </button>
+              </div>
+              <div id="vm-definitions"></div>
+              <p class="vm-total-summary" id="vm-total-summary"></p>
+            </div>
+
+            <div id="create-cost-preview" class="cost-preview-card hidden">
+              <div class="card-header">
+                <h3>Estimation de consommation</h3>
+                <p class="card-desc" id="cost-preview-summary"></p>
+              </div>
+              <div id="create-cost-details"></div>
+              <div class="form-actions" style="margin-top:1rem;padding-top:0">
+                <button type="button" class="btn btn-secondary btn-sm" id="create-quote-pdf-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                  Générer l'offre PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="create-workshop-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                Créer l'atelier
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Cost estimate -->
+        <section id="view-estimate" class="view">
+          <form id="estimate-form" class="card card-elevated form-card">
+            <div class="card-header">
+              <h2>Paramètres d'estimation</h2>
+              <p class="card-desc">Anticipez le coût mensuel avant provisionnement.</p>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="est-workshop-name">Nom de l'atelier</label>
+                <input type="text" id="est-workshop-name" placeholder="ex: Formation Azure Mars 2026">
+              </div>
+              <div class="field">
+                <label for="est-client-name">Client / Organisation</label>
+                <input type="text" id="est-client-name" placeholder="ex: Entreprise ABC">
+              </div>
+              <div class="field">
+                <label for="est-location">Région</label>
+                <select id="est-location">
+                  <option value="francecentral">France Central</option>
+                  <option value="westeurope">West Europe</option>
+                  <option value="northeurope">North Europe</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="est-days">Durée de l'atelier</label>
+                <div class="input-suffix">
+                  <input type="number" id="est-days" value="5" min="1" max="365">
+                  <span>jours</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="est-start">Démarrage</label>
+                <div class="input-suffix">
+                  <input type="number" id="est-start" value="7" min="0" max="23">
+                  <span>h</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="est-stop">Arrêt</label>
+                <div class="input-suffix">
+                  <input type="number" id="est-stop" value="19" min="0" max="23">
+                  <span>h</span>
+                </div>
+              </div>
+            </div>
+            <div class="vm-section">
+              <div class="section-header">
+                <h3>Configuration VMs</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="add-est-vm-btn">+ VM</button>
+              </div>
+              <div id="est-vm-definitions"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Calculer l'estimation</button>
+          </form>
+          <div id="estimate-result" class="card card-elevated hidden"></div>
+        </section>
+
+        <!-- Azure connection -->
+        <section id="view-azure" class="view">
+          <!-- Étape 1 : Connexion Microsoft (MFA) -->
+          <div id="azure-login-form" class="card card-elevated form-card">
+            <div class="card-header">
+              <h2>Connexion Azure</h2>
+              <p class="card-desc">Connectez-vous avec votre compte administrateur Microsoft. L'authentification multi-facteurs (MFA) est prise en charge.</p>
+            </div>
+
+            <div id="azure-setup-panel" class="azure-setup-panel">
+              <div class="azure-setup-warning" id="azure-setup-warning">
+                <strong>Configuration requise</strong>
+                <p id="azure-setup-instructions">Chargement…</p>
+              </div>
+              <ol class="azure-setup-steps" id="azure-setup-steps"></ol>
+              <dl class="vm-info-grid azure-setup-info">
+                <div><dt>Redirect URI</dt><dd><code id="azure-setup-redirect">—</code></dd></div>
+              </dl>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="azure-config-client-id">Client ID (Application ID)</label>
+                  <input type="text" id="azure-config-client-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="azure-config-tenant-id">Tenant ID <span class="field-hint">(recommandé)</span></label>
+                  <input type="text" id="azure-config-tenant-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off">
+                </div>
+                <div class="field full-width">
+                  <label for="azure-config-client-secret">Client Secret — colonne <strong>Valeur</strong> <span class="field-hint">(pas l'ID)</span></label>
+                  <input type="text" id="azure-config-client-secret" class="secret-input" placeholder="Collez ici la valeur du secret Azure AD" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+              <p class="azure-setup-hint" id="azure-secret-status"></p>
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="azure-config-save">Enregistrer la configuration</button>
+              </div>
+            </div>
+
+            <div class="azure-auth-actions">
+              <button type="button" class="btn btn-microsoft" id="azure-browser-login-btn">
+                <svg viewBox="0 0 23 23" width="18" height="18" aria-hidden="true"><rect x="1" y="1" width="10" height="10" fill="#f25022"/><rect x="12" y="1" width="10" height="10" fill="#7fba00"/><rect x="1" y="12" width="10" height="10" fill="#00a4ef"/><rect x="12" y="12" width="10" height="10" fill="#ffb900"/></svg>
+                Connexion via navigateur (MFA)
+              </button>
+            </div>
+
+            <div id="azure-device-panel" class="azure-device-panel hidden">
+              <p class="card-desc">Ouvrez la page Microsoft et saisissez le code ci-dessous pour valider votre identité (MFA inclus).</p>
+              <div class="azure-device-code" id="azure-device-code">——————</div>
+              <p class="azure-device-message" id="azure-device-message"></p>
+              <div class="form-actions">
+                <a class="btn btn-primary" id="azure-device-open" href="https://microsoft.com/devicelogin" target="_blank" rel="noopener">Ouvrir Microsoft</a>
+                <button type="button" class="btn btn-secondary" id="azure-device-cancel">Annuler</button>
+              </div>
+              <div class="azure-device-status" id="azure-device-status">
+                <span class="spinner"></span>
+                <span>En attente de votre connexion Microsoft…</span>
+              </div>
+            </div>
+
+            <details class="azure-legacy-auth">
+              <summary>Connexion par mot de passe (sans MFA)</summary>
+              <form id="azure-password-form" class="form-grid" style="margin-top:1rem">
+                <div class="field full-width">
+                  <label for="az-username">Identifiant administrateur</label>
+                  <input type="email" id="az-username" placeholder="admin@votredomaine.onmicrosoft.com" autocomplete="username">
+                </div>
+                <div class="field full-width">
+                  <label for="az-password">Mot de passe</label>
+                  <input type="password" id="az-password" placeholder="••••••••••••••••" autocomplete="current-password">
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-secondary" id="azure-login-btn">Valider la connexion</button>
+                </div>
+              </form>
+            </details>
+          </div>
+
+          <!-- Étape 2 : Choix environnement (masqué jusqu'à validation) -->
+          <div id="azure-env-panel" class="card card-elevated form-card hidden">
+            <div class="card-header">
+              <h2>Choisir l'environnement</h2>
+              <p class="card-desc">Dernière étape : sélectionnez la souscription à utiliser pour vos ateliers, puis cliquez sur « Utiliser cet environnement ».</p>
+            </div>
+            <div class="azure-login-success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+              <span>Authentification Azure réussie</span>
+            </div>
+            <dl class="vm-info-grid azure-tenant-info">
+              <div><dt>Tenant</dt><dd id="env-tenant-name">—</dd></div>
+              <div><dt>Tenant ID</dt><dd id="env-tenant-id"><code>—</code></dd></div>
+              <div><dt>Compte</dt><dd id="env-username">—</dd></div>
+              <div><dt>Souscriptions</dt><dd id="env-sub-count">—</dd></div>
+            </dl>
+            <div class="field">
+              <label for="az-subscription">Souscription de facturation</label>
+              <select id="az-subscription" required></select>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="azure-confirm-btn">Utiliser cet environnement</button>
+              <button type="button" class="btn btn-secondary" id="azure-back-btn">Changer de compte</button>
+            </div>
+          </div>
+
+          <!-- État connecté -->
+          <div id="azure-connected-info" class="card card-elevated card-success hidden">
+            <div class="form-actions" style="border:none;padding:0;margin:0 0 1rem">
+              <button type="button" class="btn btn-danger btn-sm" id="disconnect-btn">Déconnecter</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Gestion des utilisateurs (admin) -->
+        <section id="view-users" class="view">
+          <div class="card card-elevated form-card">
+            <div class="card-header">
+              <h2>Nouvel utilisateur</h2>
+              <p class="card-desc">Le mot de passe initial est <code>welcome</code> — l'utilisateur devra le changer à la première connexion.</p>
+            </div>
+            <form id="user-create-form" class="form-grid">
+              <div class="field">
+                <label for="user-username">Identifiant</label>
+                <input type="text" id="user-username" required placeholder="prenom.nom">
+              </div>
+              <div class="field">
+                <label for="user-firstname">Prénom</label>
+                <input type="text" id="user-firstname" required>
+              </div>
+              <div class="field">
+                <label for="user-lastname">Nom</label>
+                <input type="text" id="user-lastname" required>
+              </div>
+              <div class="field">
+                <label for="user-email">Adresse e-mail</label>
+                <input type="email" id="user-email" required placeholder="prenom.nom@entreprise.ch">
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+              </div>
+            </form>
+          </div>
+          <div class="card card-elevated" style="margin-top:1.25rem">
+            <div class="card-header">
+              <h2>Utilisateurs</h2>
+            </div>
+            <div id="users-list" class="table-wrap"></div>
+          </div>
+        </section>
+
+        <!-- Personnalisation du logo (admin) -->
+        <section id="view-branding" class="view">
+          <div class="card card-elevated form-card">
+            <div class="card-header">
+              <h2>Logo de la console</h2>
+              <p class="card-desc">Personnalisez le logo affiché dans la barre latérale, l'écran de connexion et les documents PDF.</p>
+            </div>
+            <div class="branding-guidelines">
+              <h3>Dimensions recommandées</h3>
+              <ul>
+                <li><strong>Format idéal :</strong> carré <strong>256×256 pixels</strong> (PNG avec fond transparent de préférence)</li>
+                <li><strong>Maximum :</strong> 512×512 pixels — l'image sera redimensionnée automatiquement</li>
+                <li><strong>Minimum :</strong> 32×32 pixels</li>
+                <li><strong>Formats acceptés :</strong> PNG, JPEG, WebP, GIF (max. 2 Mo)</li>
+              </ul>
+              <p class="meta">Affichages dans la console : barre latérale (28 px), connexion (56 px), PDF exportés (~45 px).</p>
+            </div>
+            <div class="branding-preview-row">
+              <div class="branding-preview-box">
+                <span class="branding-preview-label">Barre latérale</span>
+                <img id="branding-preview-sidebar" data-app-logo src="/api/branding/logo" alt="Aperçu" width="28" height="28" class="brand-logo">
+              </div>
+              <div class="branding-preview-box">
+                <span class="branding-preview-label">Écran de connexion</span>
+                <img id="branding-preview-login" data-app-logo src="/api/branding/logo" alt="Aperçu" width="56" height="56" class="auth-logo">
+              </div>
+              <div class="branding-preview-box branding-preview-box-lg">
+                <span class="branding-preview-label">Aperçu actuel</span>
+                <img id="branding-preview-large" data-app-logo src="/api/branding/logo" alt="Aperçu" class="branding-preview-large">
+              </div>
+            </div>
+            <p id="branding-status" class="meta"></p>
+            <form id="branding-upload-form" class="branding-upload-form">
+              <div class="field">
+                <label for="branding-file">Choisir un fichier</label>
+                <input type="file" id="branding-file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="branding-upload-btn">Téléverser le logo</button>
+                <button type="button" class="btn btn-secondary" id="branding-reset-btn">Rétablir le logo par défaut</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="modal" class="modal hidden">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js?v=1.0.0"></script>
+  <script src="/js/api.js?v=1.0.0"></script>
+  <script src="/js/branding.js?v=1.0.0"></script>
+  <script src="/js/currency.js?v=1.0.0"></script>
+  <script src="/js/app.js?v=1.0.0"></script>
+</body>
+</html>
