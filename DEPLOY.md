@@ -3,7 +3,7 @@
 Ce document décrit l'installation complète de **Lab Console** sur un nouveau serveur Linux.
 
 **Dépôt Gitea :** `git@172.16.12.12:Michel/AI-Lab.git`  
-**URL web Gitea :** http://172.16.12.12/Michel/AI-Lab
+**URL web Gitea :** http://172.16.12.12:3000/Michel/AI-Lab
 
 ---
 
