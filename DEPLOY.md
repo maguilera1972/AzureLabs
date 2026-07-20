@@ -2,8 +2,8 @@
 
 Ce document décrit l'installation complète de **Lab Console** sur un nouveau serveur Linux.
 
-**Dépôt Gitea :** `git@172.16.12.12:Michel/AzureLabs.git`  
-**URL web Gitea :** http://172.16.12.12:3000/Michel/AzureLabs
+**Dépôt Gitea :** `git@172.16.12.12:Aguilera_lab/AzureLabs.git`  
+**URL web Gitea :** http://172.16.12.12:3000/Aguilera_lab/AzureLabs
 
 ---
 
@@ -40,7 +40,7 @@ Connectez-vous au serveur cible en **root** ou avec `sudo` :
 
 ```bash
 # Cloner le dépôt
-export GITEA_REPO_URL=git@172.16.12.12:Michel/AzureLabs.git
+export GITEA_REPO_URL=git@172.16.12.12:Aguilera_lab/AzureLabs.git
 git clone "$GITEA_REPO_URL" /var/www/lab-console
 cd /var/www/lab-console
 
@@ -153,7 +153,7 @@ Ou via tag de release :
 
 Sur le serveur Gitea `172.16.12.12` :
 
-1. Activer **Actions** sur le dépôt `Michel/AzureLabs`
+1. Activer **Actions** sur le dépôt `Aguilera_lab/AzureLabs`
 2. Installer `act_runner` sur le serveur de production (label `self-hosted`)
 3. Ajouter le secret `GITEA_TOKEN` dans les paramètres du dépôt
 

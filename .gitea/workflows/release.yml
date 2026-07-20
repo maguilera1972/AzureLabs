@@ -54,7 +54,7 @@ jobs:
             -H "Authorization: token ${GITEA_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "$BODY" \
-            "http://172.16.12.12/api/v1/repos/Michel/AzureLabs/releases"
+            "http://172.16.12.12/api/v1/repos/Aguilera_lab/AzureLabs/releases"
 
       - name: Joindre le mode d'emploi PDF
         env:
@@ -63,9 +63,9 @@ jobs:
         run: |
           RELEASE_ID=$(curl -sf \
             -H "Authorization: token ${GITEA_TOKEN}" \
-            "http://172.16.12.12/api/v1/repos/Michel/AzureLabs/releases/tags/${TAG}" \
+            "http://172.16.12.12/api/v1/repos/Aguilera_lab/AzureLabs/releases/tags/${TAG}" \
             | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
           curl -sf -X POST \
             -H "Authorization: token ${GITEA_TOKEN}" \
             -F "attachment=@docs/Mode-emploi-Lab-Console.pdf" \
-            "http://172.16.12.12/api/v1/repos/Michel/AzureLabs/releases/${RELEASE_ID}/assets"
+            "http://172.16.12.12/api/v1/repos/Aguilera_lab/AzureLabs/releases/${RELEASE_ID}/assets"
