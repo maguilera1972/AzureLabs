@@ -31,10 +31,11 @@ from app.azure.pdf_branding import (
 from app.schemas import CostEstimateResponse, VMConfigInput
 
 
-def _fmt_money(amount: float, currency: str) -> str:
+def _fmt_money(amount: float, currency: str, *, hourly: bool = False) -> str:
+    decimals = 4 if hourly else 2
     if currency == "EUR":
-        return f"{amount:,.2f} €".replace(",", "'")
-    return f"{amount:,.2f} CHF".replace(",", "'")
+        return f"{amount:,.{decimals}f} €".replace(",", "'")
+    return f"{amount:,.{decimals}f} CHF".replace(",", "'")
 
 
 def _vm_config_rows(vms: list[VMConfigInput]) -> list[list[str]]:
@@ -202,7 +203,7 @@ def generate_cost_quote_pdf(
         cost_rows.append([
             item.resource,
             f"{item.quantity:,.1f}".replace(",", "'"),
-            _fmt_money(unit, currency),
+            _fmt_money(unit, currency, hourly=True),
             _fmt_money(line_total, currency),
         ])
 

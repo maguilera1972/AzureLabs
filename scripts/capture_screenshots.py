@@ -18,6 +18,7 @@ VIEWS = [
     ("04-estimation-couts", "estimate", "Estimation coûts"),
     ("05-connexion-azure", "azure", "Connexion Azure"),
     ("07-utilisateurs", "users", "Utilisateurs"),
+    ("08-logo", "branding", "Logo"),
 ]
 
 WORKSHOP_DETAIL_HTML = """
@@ -148,6 +149,7 @@ def main():
             "estimate": ("Estimation des coûts", "Anticipez le coût mensuel de provisionnement"),
             "azure": ("Connexion Azure", "Configurez la connexion à votre environnement"),
             "users": ("Utilisateurs", "Gérez les comptes d'accès à la console"),
+            "branding": ("Logo", "Personnalisez l'identité visuelle de la console"),
         }
 
         for filename, view_id, _label in VIEWS:

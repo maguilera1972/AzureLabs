@@ -1,4 +1,5 @@
 import logging
+import time
 
 import httpx
 
@@ -29,36 +30,56 @@ OS_LABELS = {
     "ubuntu": "Ubuntu LTS",
 }
 
+_price_cache: dict[tuple[str, str], tuple[float, float]] = {}
+_PRICE_CACHE_TTL = 3600
+
 
 async def _fetch_vm_price(vm_size: str, location: str) -> float:
     region = location.replace(" ", "").lower()
+    cache_key = (vm_size, region)
+    cached = _price_cache.get(cache_key)
+    if cached and (time.time() - cached[1]) < _PRICE_CACHE_TTL:
+        return cached[0]
+
     filter_query = (
         f"serviceName eq 'Virtual Machines' "
         f"and armSkuName eq '{vm_size}' "
         f"and priceType eq 'Consumption' "
         f"and contains(armRegionName, '{region}')"
     )
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(PRICES_API, params={"$filter": filter_query})
-            data = resp.json()
-            items = data.get("Items", [])
-            linux_prices = [
-                i["unitPrice"] for i in items
-                if "Windows" not in i.get("productName", "")
-                and i.get("unitOfMeasure") == "1 Hour"
-            ]
-            if linux_prices:
-                return min(linux_prices)
-            windows_prices = [
-                i["unitPrice"] for i in items
-                if i.get("unitOfMeasure") == "1 Hour"
-            ]
-            if windows_prices:
-                return min(windows_prices)
-    except Exception as e:
-        logger.warning("Retail Prices API error: %s", e)
-    return FALLBACK_PRICES.get(vm_size, 0.192)
+    for attempt in range(2):
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.get(PRICES_API, params={"$filter": filter_query})
+                resp.raise_for_status()
+                data = resp.json()
+                items = data.get("Items", [])
+                linux_prices = [
+                    i["unitPrice"] for i in items
+                    if "Windows" not in i.get("productName", "")
+                    and i.get("unitOfMeasure") == "1 Hour"
+                ]
+                if linux_prices:
+                    price = min(linux_prices)
+                    _price_cache[cache_key] = (price, time.time())
+                    return price
+                windows_prices = [
+                    i["unitPrice"] for i in items
+                    if i.get("unitOfMeasure") == "1 Hour"
+                ]
+                if windows_prices:
+                    price = min(windows_prices)
+                    _price_cache[cache_key] = (price, time.time())
+                    return price
+        except Exception as e:
+            logger.warning("Retail Prices API error (attempt %s): %s", attempt + 1, e)
+            if attempt == 0:
+                continue
+
+    fallback = FALLBACK_PRICES.get(vm_size, 0.192)
+    logger.warning("Using fallback VM price for %s in %s: %s EUR/h", vm_size, region, fallback)
+    _price_cache[cache_key] = (fallback, time.time())
+    return fallback
 
 
 def _hours_per_day(start: int, stop: int) -> float:

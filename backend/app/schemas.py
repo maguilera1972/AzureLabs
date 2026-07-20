@@ -234,12 +234,6 @@ class CostEstimateRequest(BaseModel):
     duration_days: int = Field(default=5, ge=1, le=365)
 
 
-class QuotePdfRequest(CostEstimateRequest):
-    workshop_name: str = "Atelier Azure"
-    client_name: str = ""
-    currency: str = "CHF"
-
-
 class ExchangeRateResponse(BaseModel):
     eur_to_chf: float
     chf_to_eur: float
@@ -270,6 +264,43 @@ class CostEstimateResponse(BaseModel):
     default_currency: str = "CHF"
 
 
+class QuotePdfRequest(CostEstimateRequest):
+    workshop_name: str = "Atelier Azure"
+    client_name: str = ""
+    currency: str = "CHF"
+    cost_snapshot: CostEstimateResponse | None = None
+
+
+class ConsumptionWorkshopDay(BaseModel):
+    workshop_id: int
+    workshop_name: str
+    daily_cost_eur: float
+    daily_cost_chf: float
+
+
+class ConsumptionDayPoint(BaseModel):
+    date: str
+    daily_cost_eur: float
+    daily_cost_chf: float
+    cumulative_cost_eur: float
+    cumulative_cost_chf: float
+    active_workshop_count: int
+    workshops: list[ConsumptionWorkshopDay]
+    is_today: bool = False
+    is_future: bool = False
+
+
+class ConsumptionTimeline(BaseModel):
+    start_date: str
+    end_date: str
+    today: str
+    days: list[ConsumptionDayPoint]
+    peak_daily_cost_eur: float
+    peak_daily_cost_chf: float
+    peak_date: str | None = None
+    active_workshop_count: int = 0
+
+
 class WorkshopMetrics(BaseModel):
     workshop_id: int
     workshop_name: str
@@ -296,3 +327,4 @@ class SubscriptionMetrics(BaseModel):
     exchange_rate: ExchangeRateResponse
     default_currency: str = "CHF"
     workshops: list[WorkshopMetrics]
+    consumption_timeline: ConsumptionTimeline | None = None

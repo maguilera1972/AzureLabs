@@ -241,8 +241,33 @@ def build_manual() -> Document:
     _note(doc, "Tous les utilisateurs connectés peuvent provisionner des ateliers. "
               "Chaque atelier affiche le nom de la personne qui l'a créé.")
 
-    _heading(doc, "5. Connexion Azure", 1)
-    _heading(doc, "5.1 Prérequis Azure AD", 2)
+    _heading(doc, "5. Personnalisation du logo", 1)
+    doc.add_paragraph(
+        "La section Logo (menu Configuration) est réservée aux administrateurs. Elle permet "
+        "de remplacer le logo Lab Console par celui de votre organisation. Le logo personnalisé "
+        "s'affiche dans la barre latérale, l'écran de connexion et les documents PDF exportés "
+        "(voir capture 2.9)."
+    )
+    _heading(doc, "5.1 Dimensions recommandées", 2)
+    _table(doc, ["Critère", "Valeur"], [
+        ["Format idéal", "Carré 256×256 pixels — PNG avec fond transparent de préférence"],
+        ["Maximum", "512×512 pixels — redimensionnement automatique"],
+        ["Minimum", "32×32 pixels"],
+        ["Formats acceptés", "PNG, JPEG, WebP, GIF (max. 2 Mo)"],
+        ["Affichage barre latérale", "28 px"],
+        ["Affichage connexion", "56 px"],
+        ["Affichage PDF exportés", "~45 px"],
+    ])
+    _heading(doc, "5.2 Téléversement et réinitialisation", 2)
+    _numbered(doc, "Menu Configuration → Logo")
+    _numbered(doc, "Consulter l'aperçu (barre latérale, connexion, vue agrandie)")
+    _numbered(doc, "Choisir un fichier image et cliquer sur Téléverser le logo")
+    _numbered(doc, "Pour revenir au logo d'origine : Rétablir le logo par défaut")
+    _note(doc, "Utilisez une image carrée haute résolution (256×256 px) pour un rendu net "
+              "sur tous les affichages, y compris les PDF.")
+
+    _heading(doc, "6. Connexion Azure", 1)
+    _heading(doc, "6.1 Prérequis Azure AD", 2)
     doc.add_paragraph(
         "Une application Azure AD dédiée est requise (le client Azure CLI est bloqué par les politiques "
         "Conditional Access). Créez une inscription d'application de type « Web » avec :"
@@ -252,7 +277,7 @@ def build_manual() -> Document:
     _bullet(doc, "URI de redirection : https://<votre-domaine>/api/azure/auth/callback")
     _bullet(doc, "Client Secret (colonne Valeur, pas l'ID du secret)")
 
-    _heading(doc, "5.2 Configuration dans la console", 2)
+    _heading(doc, "6.2 Configuration dans la console", 2)
     _numbered(doc, "Menu Configuration → Connexion Azure")
     _numbered(doc, "Saisir le Client ID, le Tenant ID (recommandé) et le Client Secret")
     _numbered(doc, "Cliquer sur Enregistrer la configuration")
@@ -263,28 +288,28 @@ def build_manual() -> Document:
 
     _note(doc, "Le compte doit disposer du rôle Contributor sur la souscription cible. Voir capture 2.6.")
 
-    _heading(doc, "6. Tableau de bord", 1)
+    _heading(doc, "7. Tableau de bord", 1)
     doc.add_paragraph("Le tableau de bord affiche une vue consolidée de tous les ateliers :")
     _bullet(doc, "Nombre d'ateliers, VMs totales, VMs en cours d'exécution")
     _bullet(doc, "vCPU et RAM agrégés")
     _bullet(doc, "Coût estimé total (CHF ou EUR selon la devise active)")
     _bullet(doc, "Tableau détaillé par atelier avec lien vers le détail (voir capture 2.2)")
 
-    _heading(doc, "7. Création d'un atelier", 1)
-    _heading(doc, "7.1 Informations générales", 2)
+    _heading(doc, "8. Création d'un atelier", 1)
+    _heading(doc, "8.1 Informations générales", 2)
     _table(doc, ["Champ", "Description"], [
         ["Nom de l'atelier", "Identifiant lisible (ex. Formation-Docker-Mars)"],
         ["Région Azure", "francecentral, westeurope, northeurope, switzerlandnorth"],
         ["Durée", "Nombre de jours pour le calcul des coûts (1 à 365)"],
     ])
 
-    _heading(doc, "7.2 Planification automatique", 2)
+    _heading(doc, "8.2 Planification automatique", 2)
     doc.add_paragraph(
         "Par défaut, les VMs démarrent à 7h et s'arrêtent à 19h (fuseau Europe/Paris). "
         "La planification peut être désactivée pour un pilotage manuel."
     )
 
-    _heading(doc, "7.3 Configuration des VMs", 2)
+    _heading(doc, "8.3 Configuration des VMs", 2)
     doc.add_paragraph("Pour chaque ligne de configuration :")
     _table(doc, ["Champ", "Description"], [
         ["Préfixe de nom", "Base du nom des VMs (ex. win11 → win11-01, win11-02…)"],
@@ -294,7 +319,7 @@ def build_manual() -> Document:
         ["Utilisateur / Mot de passe", "Optionnels — générés automatiquement si vides"],
     ])
 
-    _heading(doc, "7.4 Estimation et création", 2)
+    _heading(doc, "8.4 Estimation et création", 2)
     _numbered(doc, "L'estimation de consommation s'affiche automatiquement")
     _numbered(doc, "Optionnel : Générer l'offre PDF avant création")
     _numbered(doc, "Cliquer sur Créer l'atelier")
@@ -302,9 +327,9 @@ def build_manual() -> Document:
     _numbered(doc, "Le statut passe à « création en cours » avec suivi VM par VM (voir capture 2.7)")
     _note(doc, "L'atelier est associé à votre compte utilisateur (affiché dans la liste et le détail).")
 
-    _heading(doc, "8. Gestion d'un atelier", 1)
+    _heading(doc, "9. Gestion d'un atelier", 1)
     doc.add_paragraph("Depuis Ateliers, cliquez sur une carte pour ouvrir le détail (voir capture 2.3).")
-    _heading(doc, "8.1 Statuts", 2)
+    _heading(doc, "9.1 Statuts", 2)
     _table(doc, ["Statut", "Signification"], [
         ["création en cours", "Provisionnement Azure en cours"],
         ["prêt", "Toutes les VMs sont opérationnelles"],
@@ -312,20 +337,20 @@ def build_manual() -> Document:
         ["erreur", "Échec du provisionnement — supprimer et recréer"],
     ])
 
-    _heading(doc, "8.2 Actions disponibles", 2)
+    _heading(doc, "9.2 Actions disponibles", 2)
     _bullet(doc, "Rafraîchir : met à jour le statut (auto toutes les 8 s pendant création/suppression)")
     _bullet(doc, "Exporter PDF : identifiants de connexion de toutes les VMs")
     _bullet(doc, "Supprimer l'atelier : lance la suppression du groupe de ressources Azure")
     _bullet(doc, "Copier le mot de passe : sur chaque carte VM")
 
-    _heading(doc, "8.3 Suivi du provisionnement", 2)
+    _heading(doc, "9.3 Suivi du provisionnement", 2)
     doc.add_paragraph(
         "Pendant la création, chaque VM affiche un statut : En attente → Création Azure… → running. "
         "Le compteur indique X / Y VM(s) prête(s). Les identifiants et mots de passe sont visibles "
         "dès le début, avant l'attribution des adresses IP."
     )
 
-    _heading(doc, "9. Estimation des coûts et offre PDF", 1)
+    _heading(doc, "10. Estimation des coûts et offre PDF", 1)
     doc.add_paragraph("Menu Estimation coûts — permet d'anticiper les coûts sans créer d'atelier.")
     _numbered(doc, "Renseigner le nom de l'atelier et le client (optionnel)")
     _numbered(doc, "Choisir la région, la durée et la planification horaire")
@@ -335,14 +360,14 @@ def build_manual() -> Document:
 
     _note(doc, "L'offre PDF inclut le logo, le détail des coûts, le taux de change et une validité de 30 jours. Voir capture 2.5.")
 
-    _heading(doc, "10. Documents PDF", 1)
+    _heading(doc, "11. Documents PDF", 1)
     _table(doc, ["Document", "Quand", "Contenu"], [
         ["Offre commerciale", "Avant ou pendant la création", "Coûts, configuration, conditions"],
         ["Identifiants de connexion", "Dès que les VMs sont enregistrées", "Utilisateur, mot de passe, IP, commande RDP/SSH"],
     ])
     _note(doc, "Réexportez le PDF identifiants une fois toutes les IP assignées.")
 
-    _heading(doc, "11. Gestion des machines virtuelles", 1)
+    _heading(doc, "12. Gestion des machines virtuelles", 1)
     doc.add_paragraph("Sur une VM en statut prêt :")
     _bullet(doc, "Démarrer / Arrêter : contrôle manuel de l'alimentation")
     _bullet(doc, "Identifiants : fenêtre modale avec détails de connexion")
@@ -350,29 +375,30 @@ def build_manual() -> Document:
     _bullet(doc, "Windows : RDP (port 3389) — mstsc /v:<IP>")
     _bullet(doc, "Ubuntu : SSH (port 22) — ssh <utilisateur>@<IP>")
 
-    _heading(doc, "12. Planification automatique", 1)
+    _heading(doc, "13. Planification automatique", 1)
     doc.add_paragraph(
         "Si activée à la création, Azure Automation provisionne des runbooks Start-LabVMs et Stop-LabVMs "
         "dans le groupe de ressources. Les VMs démarrent et s'arrêtent selon le créneau configuré."
     )
 
-    _heading(doc, "13. Suppression d'un atelier", 1)
+    _heading(doc, "14. Suppression d'un atelier", 1)
     _numbered(doc, "Cliquer sur Supprimer l'atelier et confirmer")
     _numbered(doc, "Le statut passe à « suppression en cours »")
     _numbered(doc, "Rafraîchir pour suivre — redirection automatique quand Azure a terminé")
     _note(doc, "Si le groupe de ressources a été supprimé manuellement dans le portail Azure, un rafraîchissement finalise la suppression en base.")
 
-    _heading(doc, "14. Devise et taux de change", 1)
+    _heading(doc, "15. Devise et taux de change", 1)
     doc.add_paragraph(
         "La console affiche les coûts en CHF par défaut. Le bouton CHF/EUR dans la barre supérieure "
         "bascule l'affichage. Le taux EUR/CHF est mis à jour automatiquement toutes les heures."
     )
 
-    _heading(doc, "15. Dépannage", 1)
+    _heading(doc, "16. Dépannage", 1)
     _table(doc, ["Problème", "Solution"], [
         ["Session expirée", "Se reconnecter avec identifiant et mot de passe"],
         ["Mot de passe à changer", "Modifier le mot de passe à la première connexion"],
-        ["Accès refusé à Utilisateurs", "Seuls les administrateurs gèrent les comptes"],
+        ["Accès refusé à Utilisateurs / Logo", "Seuls les administrateurs gèrent les comptes et le logo"],
+        ["Échec téléversement logo", "Vérifier le format (PNG, JPEG, WebP, GIF) et la taille (max. 2 Mo)"],
         ["Badge Azure « Non connecté »", "Compléter l'étape 2 : choisir une souscription"],
         ["Erreur Conditional Access", "Utiliser l'application Azure AD dédiée, pas Azure CLI"],
         ["Erreur AADSTS7000218", "Vérifier que le Client Secret est bien renseigné"],
@@ -381,7 +407,7 @@ def build_manual() -> Document:
         ["PDF sans IP", "Attendre la fin du provisionnement et réexporter"],
     ])
 
-    _heading(doc, "16. Bonnes pratiques de sécurité", 1)
+    _heading(doc, "17. Bonnes pratiques de sécurité", 1)
     for item in [
         "Restreindre l'accès réseau à la console (VPN, pare-feu)",
         "Créer un compte par formateur — éviter le partage des identifiants",

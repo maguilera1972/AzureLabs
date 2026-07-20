@@ -203,6 +203,42 @@ const ICONS = {
   cost: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
 };
 
+function openMobileNav() {
+  document.querySelector(".sidebar")?.classList.add("is-open");
+  const overlay = document.getElementById("sidebar-overlay");
+  overlay?.classList.add("is-visible");
+  overlay?.setAttribute("aria-hidden", "false");
+  document.body.classList.add("mobile-nav-open");
+  document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "true");
+}
+
+function closeMobileNav() {
+  document.querySelector(".sidebar")?.classList.remove("is-open");
+  const overlay = document.getElementById("sidebar-overlay");
+  overlay?.classList.remove("is-visible");
+  overlay?.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("mobile-nav-open");
+  document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "false");
+}
+
+function initMobileNav() {
+  document.getElementById("mobile-nav-toggle")?.addEventListener("click", () => {
+    const open = document.querySelector(".sidebar")?.classList.contains("is-open");
+    if (open) closeMobileNav();
+    else openMobileNav();
+  });
+  document.getElementById("sidebar-overlay")?.addEventListener("click", closeMobileNav);
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) closeMobileNav();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMobileNav();
+  });
+  document.querySelectorAll(".sidebar-nav .nav-link").forEach((link) => {
+    link.addEventListener("click", closeMobileNav);
+  });
+}
+
 function updateTopbar(view, customTitle) {
   const info = PAGE_TITLES[view] || PAGE_TITLES.dashboard;
   document.getElementById("page-title").textContent = customTitle || info.title;
@@ -223,6 +259,7 @@ function toast(msg, type = "success") {
 
 function showView(name, customTitle) {
   if (name !== "workshop-detail") stopWorkshopPoll();
+  closeMobileNav();
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
   const view = document.getElementById(`view-${name}`);
@@ -525,10 +562,14 @@ function updateVmTotalSummary() {
 let costEstimateTimer = null;
 let lastCostEstimate = null;
 let lastEstimateParams = null;
+let lastEstimateResult = null;
 
 function getQuotePdfParams(extra = {}) {
   const currency = Currency.display === "EUR" ? "EUR" : "CHF";
-  return { ...extra, currency };
+  const { cost_snapshot, ...rest } = extra;
+  const payload = { ...rest, currency };
+  if (cost_snapshot) payload.cost_snapshot = cost_snapshot;
+  return payload;
 }
 
 async function downloadQuotePdf(params) {
@@ -543,16 +584,21 @@ async function downloadQuotePdf(params) {
 async function downloadCreateQuotePdf() {
   const params = getCreateFormParams();
   if (params.vms.length === 0) return toast("Ajoutez au moins une configuration VM", "error");
+  if (!lastCostEstimate) return toast("Estimation en cours, patientez…", "error");
   await downloadQuotePdf({
     ...params,
     workshop_name: document.getElementById("ws-name").value.trim() || "Atelier Azure",
     client_name: "",
+    cost_snapshot: lastCostEstimate,
   });
 }
 
 async function downloadEstimateQuotePdf() {
-  if (!lastEstimateParams) return toast("Calculez d'abord l'estimation", "error");
-  await downloadQuotePdf(lastEstimateParams);
+  if (!lastEstimateParams || !lastEstimateResult) return toast("Calculez d'abord l'estimation", "error");
+  await downloadQuotePdf({
+    ...lastEstimateParams,
+    cost_snapshot: lastEstimateResult,
+  });
 }
 
 function getCreateFormParams() {
@@ -746,9 +792,133 @@ async function disconnectAzure() {
   }
 }
 
+let lastConsumptionTimeline = null;
+
+function _consumptionDayValue(day) {
+  return Currency.display === "EUR" ? day.daily_cost_eur : day.daily_cost_chf;
+}
+
+function _consumptionCumulativeValue(day) {
+  return Currency.display === "EUR" ? day.cumulative_cost_eur : day.cumulative_cost_chf;
+}
+
+function _formatChartDate(isoDate) {
+  const [y, m, d] = isoDate.split("-");
+  return `${d}.${m}`;
+}
+
+function renderConsumptionChart(timeline) {
+  const el = document.getElementById("dashboard-consumption-chart");
+  if (!el) return;
+  lastConsumptionTimeline = timeline;
+
+  if (!timeline?.days?.length) {
+    el.innerHTML = `<div class="empty-state"><p>Aucune donnée de consommation disponible.</p></div>`;
+    return;
+  }
+
+  const days = timeline.days;
+  const values = days.map(_consumptionDayValue);
+  const maxVal = Math.max(...values, 0.01);
+  const suffix = Currency.display === "EUR" ? "€" : "CHF";
+  const todayPoint = days.find((d) => d.is_today) || days[days.length - 1];
+  const todayVal = _consumptionDayValue(todayPoint);
+  const peakVal = Currency.display === "EUR"
+    ? timeline.peak_daily_cost_eur
+    : timeline.peak_daily_cost_chf;
+
+  const chartW = 900;
+  const chartH = 220;
+  const padL = 48;
+  const padR = 12;
+  const padT = 16;
+  const padB = 36;
+  const innerW = chartW - padL - padR;
+  const innerH = chartH - padT - padB;
+  const barGap = 2;
+  const barW = Math.max(4, (innerW - barGap * (days.length - 1)) / days.length);
+
+  const bars = days.map((day, i) => {
+    const val = _consumptionDayValue(day);
+    const h = (val / maxVal) * innerH;
+    const x = padL + i * (barW + barGap);
+    const y = padT + innerH - h;
+    const classes = [
+      "consumption-bar",
+      day.is_today ? "is-today" : "",
+      day.is_future ? "is-future" : "",
+      val <= 0 ? "is-empty" : "",
+    ].filter(Boolean).join(" ");
+    const workshops = day.workshops?.length
+      ? day.workshops.map((w) => `${w.workshop_name}: ${Currency.format(w.daily_cost_chf, w.daily_cost_eur)}`).join("&#10;")
+      : "Aucun atelier actif";
+    const title = `${day.date} — ${val.toFixed(2)} ${suffix} (${day.active_workshop_count} atelier(s))&#10;${workshops}`;
+    return `<rect class="${classes}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h, day.active_workshop_count ? 2 : 0).toFixed(1)}" rx="2"><title>${title}</title></rect>`;
+  }).join("");
+
+  const cumValues = days.map(_consumptionCumulativeValue);
+  const maxCum = Math.max(...cumValues, 0.01);
+  const cumPoints = days.map((day, i) => {
+    const x = padL + i * (barW + barGap) + barW / 2;
+    const y = padT + innerH - (_consumptionCumulativeValue(day) / maxCum) * innerH;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+
+  const yTicks = [0, 0.5, 1].map((ratio) => {
+    const val = maxVal * ratio;
+    const y = padT + innerH - ratio * innerH;
+    return `
+      <line class="consumption-grid-line" x1="${padL}" y1="${y}" x2="${chartW - padR}" y2="${y}"></line>
+      <text class="consumption-axis-label" x="${padL - 8}" y="${y + 4}" text-anchor="end">${val.toFixed(0)}</text>
+    `;
+  }).join("");
+
+  const xLabels = days.filter((_, i) => i % Math.ceil(days.length / 8) === 0 || days[i].is_today).map((day) => {
+    const i = days.indexOf(day);
+    const x = padL + i * (barW + barGap) + barW / 2;
+    return `<text class="consumption-axis-label" x="${x}" y="${chartH - 8}" text-anchor="middle">${_formatChartDate(day.date)}</text>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="consumption-chart-summary">
+      <div class="consumption-stat">
+        <span class="consumption-stat-label">Aujourd'hui</span>
+        <strong>${todayVal.toFixed(2)} ${suffix}</strong>
+        <span class="meta">${todayPoint.active_workshop_count} atelier(s) actif(s)</span>
+      </div>
+      <div class="consumption-stat">
+        <span class="consumption-stat-label">Pic journalier</span>
+        <strong>${peakVal.toFixed(2)} ${suffix}</strong>
+        <span class="meta">${timeline.peak_date ? _formatChartDate(timeline.peak_date) : "—"}</span>
+      </div>
+      <div class="consumption-stat">
+        <span class="consumption-stat-label">Cumul période</span>
+        <strong>${_consumptionCumulativeValue(days[days.length - 1]).toFixed(2)} ${suffix}</strong>
+        <span class="meta">${_formatChartDate(timeline.start_date)} → ${_formatChartDate(timeline.end_date)}</span>
+      </div>
+      <div class="consumption-legend">
+        <span><i class="legend-swatch past"></i> Passé</span>
+        <span><i class="legend-swatch today"></i> Aujourd'hui</span>
+        <span><i class="legend-swatch future"></i> Projection</span>
+        <span><i class="legend-line"></i> Cumul</span>
+      </div>
+    </div>
+    <div class="consumption-chart-scroll">
+      <svg class="consumption-chart" viewBox="0 0 ${chartW} ${chartH}" preserveAspectRatio="xMinYMid meet" aria-label="Évolution journalière de la consommation">
+        ${yTicks}
+        ${bars}
+        <polyline class="consumption-cumulative" points="${cumPoints}"></polyline>
+        ${xLabels}
+      </svg>
+    </div>
+    <p class="consumption-chart-note meta">Estimation basée sur la planification horaire de chaque atelier (coût total ÷ durée). Les jours futurs sont une projection.</p>
+  `;
+}
+
 async function loadDashboard() {
   const metricsEl = document.getElementById("dashboard-metrics");
   const tableEl = document.getElementById("dashboard-workshops");
+  const chartEl = document.getElementById("dashboard-consumption-chart");
   try {
     const m = await API.subscriptionMetrics();
     if (m.exchange_rate) Currency.rate = m.exchange_rate;
@@ -779,6 +949,8 @@ async function loadDashboard() {
         <div class="sub">Basé sur planification 7h–19h</div>
       </div>
     `;
+
+    renderConsumptionChart(m.consumption_timeline);
 
     if (m.workshops.length === 0) {
       tableEl.innerHTML = `<div class="empty-state"><p>Aucun atelier pour le moment.</p><p><a href="#" onclick="showView('create');return false">Créer un premier atelier →</a></p></div>`;
@@ -816,6 +988,7 @@ async function loadDashboard() {
   } catch (e) {
     metricsEl.innerHTML = `<div class="empty-state"><p>Connectez-vous à Azure pour voir les métriques.</p><p><a href="#" onclick="showView('azure');return false">Configurer la connexion →</a></p></div>`;
     tableEl.innerHTML = "";
+    if (chartEl) chartEl.innerHTML = "";
   }
 }
 
@@ -1105,6 +1278,7 @@ document.getElementById("estimate-form").addEventListener("submit", async (e) =>
       client_name: document.getElementById("est-client-name").value.trim(),
     };
     const cost = await API.estimateCost(lastEstimateParams);
+    lastEstimateResult = cost;
     if (cost.exchange_rate) Currency.rate = cost.exchange_rate;
     Currency._updateRateDisplay();
     renderCostResult(cost, "estimate-result");
@@ -1508,6 +1682,7 @@ async function bootApp() {
 }
 
 // Init
+initMobileNav();
 createVMRow("vm-definitions");
 createVMRow("est-vm-definitions", "est");
 Branding.init().then(() => {

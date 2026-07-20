@@ -28,6 +28,7 @@ from app.models import ConsoleUser, VirtualMachine, Workshop
 from app.schemas import (
     CostEstimateRequest,
     CostEstimateResponse,
+    ConsumptionTimeline,
     ExchangeRateResponse,
     SubscriptionMetrics,
     QuotePdfRequest,
@@ -39,6 +40,7 @@ from app.schemas import (
     WorkshopResponse,
 )
 from app.services.console_auth import get_current_user, user_display_name
+from app.services.consumption_timeline import build_consumption_timeline
 
 from app.services.credentials import get_active_credentials, get_active_connection_record
 
@@ -564,7 +566,10 @@ async def download_quote_pdf(
     req: QuotePdfRequest,
     _: ConsoleUser = Depends(get_current_user),
 ):
-    cost = await estimate_workshop_cost(req)
+    if req.cost_snapshot:
+        cost = req.cost_snapshot
+    else:
+        cost = await estimate_workshop_cost(req)
     currency = req.currency.upper() if req.currency.upper() in ("CHF", "EUR") else "CHF"
     pdf_bytes = generate_cost_quote_pdf(
         workshop_name=req.workshop_name,
@@ -644,6 +649,8 @@ async def subscription_metrics(
         total_ram += hw["total_ram_gb"]
         total_cost_eur += w.estimated_monthly_cost_eur
 
+    timeline_data = build_consumption_timeline(workshops, rate.eur_to_chf)
+
     return SubscriptionMetrics(
         subscription_id=conn.subscription_id if conn else "",
         subscription_name=conn.subscription_name if conn else "Non connecté",
@@ -661,4 +668,5 @@ async def subscription_metrics(
             source=rate.source,
         ),
         workshops=workshop_metrics,
+        consumption_timeline=ConsumptionTimeline(**timeline_data),
     )

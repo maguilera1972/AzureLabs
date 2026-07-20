@@ -127,16 +127,17 @@ L'estimation utilise l'[API Azure Retail Prices](https://prices.azure.com/api/re
 
 Les coûts réels peuvent varier selon la région, les offres et la consommation effective.
 
-## Dépôt Git et CI/CD
+## Dépôt Git et déploiement
 
-- **Gitea :** https://git.aguilera.ch/Michel/AzureLabs
-- **Workflows :** CI, régénération du mode d'emploi, release + déploiement automatique
-- **Documentation :** voir [`deploy/README.md`](deploy/README.md)
+- **Gitea :** `git@172.16.12.12:Michel/AI-Lab.git`
+- **Guide d'installation :** [`DEPLOY.md`](DEPLOY.md)
+- **Scripts serveur :** [`deploy/`](deploy/)
 
 ```bash
-# Déployer une mise à jour
-./deploy/deploy.sh main
+# Nouveau serveur
+git clone git@172.16.12.12:Michel/AI-Lab.git /var/www/lab-console
+cd /var/www/lab-console && sudo ./deploy/install.sh
 
-# Publier une release (tag vX.Y.Z → déploiement + release Gitea)
-./scripts/tag_release.sh 1.0.1
+# Mise à jour
+./deploy/deploy.sh main
 ```

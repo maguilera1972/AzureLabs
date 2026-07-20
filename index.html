@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Lab Console — Azure Training Labs</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=1.0.0">
+  <link rel="stylesheet" href="/css/style.css?v=1.1.0.0.1">
 </head>
 <body>
   <!-- Écran de connexion -->
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <nav class="sidebar-nav">
+      <nav class="sidebar-nav" id="sidebar-nav">
         <span class="nav-section">Navigation</span>
         <button class="nav-item active" data-view="dashboard">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -100,7 +100,7 @@
         </button>
 
         <span class="nav-section">Aide</span>
-        <a class="nav-item nav-link" href="/docs/Mode-emploi-Lab-Console.pdf?v=1.0.0" download="Mode-emploi-Lab-Console.pdf" title="Mode d'emploi avec captures d'écran">
+        <a class="nav-item nav-link" href="/docs/Mode-emploi-Lab-Console.pdf?v=1.1.0" target="_blank" rel="noopener noreferrer" title="Mode d'emploi avec captures d'écran">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>
           Mode d'emploi (PDF)
         </a>
@@ -117,9 +117,16 @@
       </div>
     </aside>
 
+    <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-left">
+          <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="sidebar-nav">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
           <div class="topbar-title">
             <h2 id="page-title">Tableau de bord</h2>
             <p id="page-subtitle">Vue consolidée de vos ateliers Azure</p>
@@ -150,6 +157,15 @@
         <!-- Dashboard -->
         <section id="view-dashboard" class="view active">
           <div id="dashboard-metrics" class="metrics-grid"></div>
+          <div class="card card-elevated dashboard-chart-card">
+            <div class="card-header">
+              <h2>Évolution de la consommation</h2>
+              <p class="card-desc">Coût estimé journalier sur la souscription, selon les ateliers provisionnés et leur durée planifiée.</p>
+            </div>
+            <div id="dashboard-consumption-chart" class="consumption-chart-wrap">
+              <p class="meta">Chargement…</p>
+            </div>
+          </div>
           <div class="card card-elevated">
             <div class="card-header">
               <h2>Ateliers par groupe de ressources</h2>
@@ -545,10 +561,10 @@
     </div>
   </div>
 
-  <script src="/js/auth.js?v=1.0.0"></script>
-  <script src="/js/api.js?v=1.0.0"></script>
-  <script src="/js/branding.js?v=1.0.0"></script>
-  <script src="/js/currency.js?v=1.0.0"></script>
-  <script src="/js/app.js?v=1.0.0"></script>
+  <script src="/js/auth.js?v=1.1.0.0.0"></script>
+  <script src="/js/api.js?v=1.1.0.0.0"></script>
+  <script src="/js/branding.js?v=1.1.0.0.0"></script>
+  <script src="/js/currency.js?v=1.1.0.0.0"></script>
+  <script src="/js/app.js?v=1.1.0.0.1"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_DIR="${LAB_CONSOLE_HOME:-/var/www/lab-console}"
-REPO_URL="${GITEA_REPO_URL:-https://git.aguilera.ch/Michel/AzureLabs.git}"
+REPO_URL="${GITEA_REPO_URL:-git@172.16.12.12:Michel/AI-Lab.git}"
 
 log() { echo "[install] $*"; }
 
@@ -47,4 +47,4 @@ systemctl enable lab-console-api
 systemctl restart lab-console-api
 nginx -t && systemctl reload nginx
 
-log "Installation terminée — https://azurelabs.aguilera.ch"
+log "Installation terminée — configurez backend/.env puis accédez à http://<votre-serveur>/"
