@@ -6,8 +6,8 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-REMOTE_SSH="git@172.16.12.12:Aguilera_lab/AzureLabs.git"
-REMOTE_HTTP="http://172.16.12.12:3000/Aguilera_Lab/AzureLabs.git"
+REMOTE_SSH="git@git.aguilera.ch:Aguilera_lab/AzureLabs.git"
+REMOTE_HTTP="https://git.aguilera.ch/Aguilera_Lab/AzureLabs.git"
 BRANCH="main"
 
 git_cmd() {
@@ -21,7 +21,7 @@ if ! git_cmd remote get-url origin >/dev/null 2>&1; then
   git_cmd remote add origin "${REMOTE_SSH}"
 else
   CURRENT="$(git_cmd remote get-url origin)"
-  if [[ "${CURRENT}" != *"Aguilera_lab/AzureLabs"* && "${CURRENT}" != *"Aguilera_Lab/AzureLabs"* ]]; then
+  if [[ "${CURRENT}" != "${REMOTE_SSH}" ]]; then
     echo "Fixing origin: ${CURRENT} -> ${REMOTE_SSH}"
     git_cmd remote set-url origin "${REMOTE_SSH}"
   fi
@@ -80,7 +80,7 @@ push_http() {
     return 1
   fi
   # Ephemeral remote URL with token; never written to disk config permanently
-  local url="http://oauth2:${GITEA_TOKEN}@172.16.12.12:3000/Aguilera_Lab/AzureLabs.git"
+  local url="https://oauth2:${GITEA_TOKEN}@git.aguilera.ch/Aguilera_Lab/AzureLabs.git"
   git_cmd push "${url}" "HEAD:refs/heads/${BRANCH}"
 }
 

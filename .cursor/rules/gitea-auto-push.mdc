@@ -14,8 +14,8 @@ User explicitly says not to commit/push, e.g. `ne pas pousser`, `sans commit`, `
 ## Repo
 
 - Path: `/var/www/lab-console`
-- Remote: `git@172.16.12.12:Aguilera_lab/AzureLabs.git`
-- Web: http://172.16.12.12:3000/Aguilera_Lab/AzureLabs
+- Remote: `git@git.aguilera.ch:Aguilera_lab/AzureLabs.git`
+- Web: https://git.aguilera.ch/Aguilera_Lab/AzureLabs
 - Branch: `main`
 
 Prefer: `./scripts/push_to_gitea.sh "<message>"` when the script exists.
@@ -31,7 +31,7 @@ GIT_CONFIG_GLOBAL=/dev/null git -c safe.directory=/var/www/lab-console -C /var/w
 1. In parallel: `status`, `diff` (staged+unstaged), `log -5 --oneline`
 2. If no real changes → do not create an empty commit; tell the user
 3. Fix origin if wrong:
-   `remote set-url origin git@172.16.12.12:Aguilera_lab/AzureLabs.git`
+   `remote set-url origin git@git.aguilera.ch:Aguilera_lab/AzureLabs.git`
 4. Stage relevant files only. **Never** stage: `backend/.env`, `data/*`, secrets, tokens, credentials
 5. Commit via HEREDOC (clear why-focused message):
 
@@ -44,5 +44,5 @@ EOF
 ```
 
 6. Push `origin main` (SSH first). **No** `--force`. **No** amend unless user commit rules allow
-7. If SSH auth fails, retry HTTP (`http://172.16.12.12:3000/Aguilera_Lab/AzureLabs.git`) using env/`gh`/ask — **never** hardcode or write tokens into files
+7. If SSH auth fails, retry HTTPS (`https://git.aguilera.ch/Aguilera_Lab/AzureLabs.git`) using env/`gh`/ask — **never** hardcode or write tokens into files
 8. Confirm briefly: short hash + pushed to Gitea `Aguilera_lab/AzureLabs` (`main`)

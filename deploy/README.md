@@ -1,6 +1,6 @@
 # Déploiement et CI/CD — Lab Console
 
-**Dépôt :** `git@172.16.12.12:Aguilera_lab/AzureLabs.git`  
+**Dépôt :** `git@git.aguilera.ch:Aguilera_lab/AzureLabs.git`  
 **Guide complet :** [`../DEPLOY.md`](../DEPLOY.md)
 
 **Développement :** les mises à jour de code/config/docs sont poussées sur `Aguilera_lab/AzureLabs` (`main`) après chaque session de changements. Voir `../scripts/push_to_gitea.sh` et la règle Cursor `.cursor/rules/gitea-auto-push.mdc`.
@@ -19,7 +19,7 @@
 ## Installation rapide
 
 ```bash
-git clone git@172.16.12.12:Aguilera_lab/AzureLabs.git /var/www/lab-console
+git clone git@git.aguilera.ch:Aguilera_lab/AzureLabs.git /var/www/lab-console
 cd /var/www/lab-console
 sudo ./deploy/install.sh
 sudo nano /var/www/lab-console/backend/.env   # SECRET_KEY + URL publique
@@ -50,7 +50,7 @@ chmod +x /usr/local/bin/act_runner
 
 # Token : Gitea → Dépôt → Paramètres → Actions → Runners
 act_runner register \
-  --instance http://172.16.12.12 \
+  --instance https://git.aguilera.ch \
   --token <TOKEN_RUNNER> \
   --name lab-console-runner \
   --labels self-hosted:host
@@ -68,7 +68,7 @@ Dépôt → Paramètres → Secrets → `GITEA_TOKEN`
 | Variable | Défaut | Description |
 |----------|--------|-------------|
 | `LAB_CONSOLE_HOME` | `/var/www/lab-console` | Répertoire d'installation |
-| `GITEA_REPO_URL` | `git@172.16.12.12:Aguilera_lab/AzureLabs.git` | URL du dépôt (install.sh) |
+| `GITEA_REPO_URL` | `git@git.aguilera.ch:Aguilera_lab/AzureLabs.git` | URL du dépôt (install.sh) |
 | `LAB_CONSOLE_SERVICE` | `lab-console-api` | Service systemd |
 | `DEPLOY_REF` | `origin/main` | Référence git à déployer |
 
