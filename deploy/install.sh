@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_DIR="${LAB_CONSOLE_HOME:-/var/www/lab-console}"
-REPO_URL="${GITEA_REPO_URL:-git@172.16.12.12:Michel/AI-Lab.git}"
+REPO_URL="${GITEA_REPO_URL:-git@172.16.12.12:Michel/AzureLabs.git}"
 
 log() { echo "[install] $*"; }
 

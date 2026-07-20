@@ -1,6 +1,6 @@
 # Déploiement et CI/CD — Lab Console
 
-**Dépôt :** `git@172.16.12.12:Michel/AI-Lab.git`  
+**Dépôt :** `git@172.16.12.12:Michel/AzureLabs.git`  
 **Guide complet :** [`../DEPLOY.md`](../DEPLOY.md)
 
 ## Fichiers
@@ -17,7 +17,7 @@
 ## Installation rapide
 
 ```bash
-git clone git@172.16.12.12:Michel/AI-Lab.git /var/www/lab-console
+git clone git@172.16.12.12:Michel/AzureLabs.git /var/www/lab-console
 cd /var/www/lab-console
 sudo ./deploy/install.sh
 sudo nano /var/www/lab-console/backend/.env   # SECRET_KEY + URL publique
@@ -66,7 +66,7 @@ Dépôt → Paramètres → Secrets → `GITEA_TOKEN`
 | Variable | Défaut | Description |
 |----------|--------|-------------|
 | `LAB_CONSOLE_HOME` | `/var/www/lab-console` | Répertoire d'installation |
-| `GITEA_REPO_URL` | `git@172.16.12.12:Michel/AI-Lab.git` | URL du dépôt (install.sh) |
+| `GITEA_REPO_URL` | `git@172.16.12.12:Michel/AzureLabs.git` | URL du dépôt (install.sh) |
 | `LAB_CONSOLE_SERVICE` | `lab-console-api` | Service systemd |
 | `DEPLOY_REF` | `origin/main` | Référence git à déployer |
 

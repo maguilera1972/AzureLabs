@@ -129,13 +129,13 @@ Les coûts réels peuvent varier selon la région, les offres et la consommation
 
 ## Dépôt Git et déploiement
 
-- **Gitea :** `git@172.16.12.12:Michel/AI-Lab.git`
+- **Gitea :** `git@172.16.12.12:Michel/AzureLabs.git`
 - **Guide d'installation :** [`DEPLOY.md`](DEPLOY.md)
 - **Scripts serveur :** [`deploy/`](deploy/)
 
 ```bash
 # Nouveau serveur
-git clone git@172.16.12.12:Michel/AI-Lab.git /var/www/lab-console
+git clone git@172.16.12.12:Michel/AzureLabs.git /var/www/lab-console
 cd /var/www/lab-console && sudo ./deploy/install.sh
 
 # Mise à jour
