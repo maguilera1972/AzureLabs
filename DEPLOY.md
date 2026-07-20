@@ -5,6 +5,8 @@ Ce document décrit l'installation complète de **Lab Console** sur un nouveau s
 **Dépôt Gitea :** `git@172.16.12.12:Aguilera_lab/AzureLabs.git`  
 **URL web Gitea :** http://172.16.12.12:3000/Aguilera_lab/AzureLabs
 
+**Développement :** après chaque session de modifications demandées, les changements sont commités et poussés sur `Aguilera_lab/AzureLabs` (`main`). Script manuel : `./scripts/push_to_gitea.sh "message"`. Pour éviter le push : préciser « sans commit » / « ne pas pousser ».
+
 ---
 
 ## 1. Prérequis

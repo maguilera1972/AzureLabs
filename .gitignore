@@ -21,7 +21,9 @@ data/*
 *.swo
 .idea/
 .vscode/
-.cursor/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
 
 # Logs
 *.log

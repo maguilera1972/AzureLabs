@@ -3,6 +3,8 @@
 **Dépôt :** `git@172.16.12.12:Aguilera_lab/AzureLabs.git`  
 **Guide complet :** [`../DEPLOY.md`](../DEPLOY.md)
 
+**Développement :** les mises à jour de code/config/docs sont poussées sur `Aguilera_lab/AzureLabs` (`main`) après chaque session de changements. Voir `../scripts/push_to_gitea.sh` et la règle Cursor `.cursor/rules/gitea-auto-push.mdc`.
+
 ## Fichiers
 
 | Fichier | Rôle |
