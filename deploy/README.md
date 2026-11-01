@@ -3,7 +3,7 @@
 **Dépôt :** `git@git.aguilera.ch:Aguilera_lab/AzureLabs.git`  
 **Guide complet :** [`../DEPLOY.md`](../DEPLOY.md)
 
-**Développement :** les mises à jour de code/config/docs sont poussées sur `Aguilera_lab/AzureLabs` (`main`) après chaque session de changements. Voir `../scripts/push_to_gitea.sh` et la règle Cursor `.cursor/rules/gitea-auto-push.mdc`.
+**Développement :** les mises à jour de code/config/docs sont poussées sur `Aguilera_lab/AzureLabs` (`main`) après chaque session de changements. Voir `../scripts/push_to_gitea.sh`.
 
 ## Fichiers
 
@@ -32,36 +32,6 @@ sudo systemctl restart lab-console-api
 cd /var/www/lab-console
 ./deploy/deploy.sh main
 ```
-
-## Workflows Gitea (`.gitea/workflows/`)
-
-| Workflow | Déclencheur | Action |
-|----------|-------------|--------|
-| **CI** | Push / PR sur `main` | Vérifie Python + FastAPI |
-| **Contenu** | Push UI ou manuel | Régénère le mode d'emploi |
-| **Release** | Tag `v*` | Déploie + release Gitea |
-
-### Runner Gitea (`act_runner`)
-
-```bash
-curl -sL https://gitea.com/gitea/act_runner/releases/latest/download/act_runner-linux-amd64 \
-  -o /usr/local/bin/act_runner
-chmod +x /usr/local/bin/act_runner
-
-# Token : Gitea → Dépôt → Paramètres → Actions → Runners
-act_runner register \
-  --instance https://git.aguilera.ch \
-  --token <TOKEN_RUNNER> \
-  --name lab-console-runner \
-  --labels self-hosted:host
-
-systemctl enable --now gitea-act-runner   # voir DEPLOY.md pour le unit file
-```
-
-### Secret `GITEA_TOKEN`
-
-Gitea → Paramètres utilisateur → Applications → token (`write:repository`)  
-Dépôt → Paramètres → Secrets → `GITEA_TOKEN`
 
 ## Variables d'environnement
 
